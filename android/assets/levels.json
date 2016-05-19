@@ -1,0 +1,33 @@
+[
+  {
+    "number": 1,
+    "width": 4,
+    "height": 4,
+    "cells": [
+      [
+        { "type": "empty" },
+        { "type": "empty" },
+        { "type": "empty" },
+        { "type": "empty" }
+      ],
+      [
+        { "type": "empty", "slider": "pink" },
+        { "type": "button", "color": "pink" },
+        { "type": "bomb" },
+        { "type": "pocket", "color": "pink" }
+      ],
+      [
+        { "type": "empty" },
+        { "type": "empty" },
+        { "type": "empty" },
+        { "type": "empty" }
+      ],
+      [
+        null,
+        null,
+        null,
+        null
+      ]
+    ]
+  }
+]
