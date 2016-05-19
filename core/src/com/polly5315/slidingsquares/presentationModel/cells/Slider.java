@@ -72,8 +72,12 @@ public class Slider implements ISlider {
 
     @Override
     public void setPosition(int x, int y) {
+        if (x == _x && y == _y)
+            return;
         _x = x;
         _y = y;
+        for (IListener listener : _listeners)
+            listener.onPositionChanged(this);
     }
 
     @Override

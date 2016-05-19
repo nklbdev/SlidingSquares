@@ -32,6 +32,11 @@ public class Engine implements IEngine {
             if (allSlidersAreFixed)
                 setState(EngineState.Winned);
         }
+
+        @Override
+        public void onPositionChanged(ISlider slider) {
+
+        }
     };
 
     public Engine(int width, int height) {
@@ -199,6 +204,7 @@ public class Engine implements IEngine {
         validateVacantCell(x, y);
 
         ISlider slider = new Slider(color, state);
+        slider.setPosition(x, y);
 
         slider.addListener(_sliderListener);
 
@@ -208,30 +214,5 @@ public class Engine implements IEngine {
             listener.onSliderAdded(this, slider, x, y);
 
         return slider;
-    }
-
-    @Override
-    public Collection<IEmptyCell> getEmptyCells() {
-        return Collections.unmodifiableCollection(_emptyCells);
-    }
-
-    @Override
-    public Collection<IBombCell> getBombCells() {
-        return Collections.unmodifiableCollection(_bombCells);
-    }
-
-    @Override
-    public Collection<IPocketCell> getPocketCells() {
-        return Collections.unmodifiableCollection(_pocketCells);
-    }
-
-    @Override
-    public Collection<IButtonCell> getButtonCells() {
-        return Collections.unmodifiableCollection(_buttonCells);
-    }
-
-    @Override
-    public Collection<ISlider> getSliders() {
-        return Collections.unmodifiableCollection(_sliders);
     }
 }

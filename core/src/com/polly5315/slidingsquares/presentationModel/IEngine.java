@@ -29,10 +29,4 @@ public interface IEngine {
     IPocketCell addPocketCell(int x, int y, FamilyColor color, PocketCellState state);
     IBombCell addBombCell(int x, int y, boolean isDetonated);
     ISlider addSlider(int x, int y, FamilyColor color, SliderState state);
-
-    Collection<IEmptyCell> getEmptyCells();
-    Collection<IBombCell> getBombCells();
-    Collection<IPocketCell> getPocketCells();
-    Collection<IButtonCell> getButtonCells();
-    Collection<ISlider> getSliders();
 }
