@@ -5,7 +5,7 @@ import com.polly5315.slidingsquares.presentationModel.cells.*;
 
 import java.util.*;
 
-public class Engine implements IEngine {
+public class Engine implements IEngine, ISliderMover {
     private final Set<IListener> _listeners = new HashSet<IListener>();
     private EngineState _state;
     private final int _width;
@@ -17,7 +17,6 @@ public class Engine implements IEngine {
     private final Collection<ISlider> _sliders = new ArrayList<ISlider>();
     private final ICell[][] _cells;
     private int _turnCount = 0;
-    private Direction _turnDirection;
     private final ISlider.IListener _sliderListener = new ISlider.IListener() {
         @Override
         public void onStateChanged(ISlider slider) {
@@ -57,20 +56,27 @@ public class Engine implements IEngine {
         if (_state != EngineState.WaitingForTurn)
             return;
         setState(EngineState.ProcessingTurn);
-        _turnDirection = direction;
+        for (ISlider slider : _sliders)
+            slider.start(direction);
     }
 
     @Override
     public void doStep() {
         if (_state != EngineState.ProcessingTurn)
             return;
+        for (ISlider slider : _sliders)
+            slider.increaseStamina();
+        for (ISlider slider : _sliders)
+            slider.slide();
+        boolean slidingSlidersAbsent = true;
         for (ISlider slider : _sliders) {
-            if (slider.getState() != SliderState.Idle)
-                continue;
-            ICell targetCell = _cells[slider.getX() + _turnDirection.x][slider.getY() + _turnDirection.y];
-            slider.setPosition(slider.getX() + _turnDirection.x, slider.getY() + _turnDirection.y);
-            targetCell.Push(slider);
+            if (slider.getState() == SliderState.Sliding) {
+                slidingSlidersAbsent = false;
+                break;
+            }
         }
+        if (slidingSlidersAbsent)
+            setState(EngineState.WaitingForTurn);
     }
 
     @Override
@@ -160,6 +166,7 @@ public class Engine implements IEngine {
                 pocketCell.addButtonToListen(cell);
 
         _cells[x][y] = cell;
+        _buttonCells.add(cell);
 
         for (IListener listener : _listeners)
             listener.onButtonCellAdded(this, cell, x, y);
@@ -203,16 +210,43 @@ public class Engine implements IEngine {
     public ISlider addSlider(int x, int y, FamilyColor color, SliderState state) {
         validateVacantCell(x, y);
 
-        ISlider slider = new Slider(color, state);
+        ISlider slider = new Slider(color, state, this);
         slider.setPosition(x, y);
 
         slider.addListener(_sliderListener);
 
-        _cells[x][y].Push(slider);
+        _sliders.add(slider);
+
+        _cells[x][y].push(slider);
 
         for (IListener listener : _listeners)
             listener.onSliderAdded(this, slider, x, y);
 
         return slider;
+    }
+
+    @Override
+    public void moveSlider(ISlider slider, int x, int y) {
+        if (x < 0 || x >= _width || y < 0 || y >= _height) {
+            slider.stop();
+        } else {
+            ICell sourceCell = _cells[slider.getX()][slider.getY()];
+            ICell destinationCell = _cells[x][y];
+            if (destinationCell == null) {
+                slider.stop();
+            } else {
+                ISlider sliderInDestinationCell = destinationCell.getSlider();
+                if (sliderInDestinationCell != null)
+                    sliderInDestinationCell.slide();
+                if (sliderInDestinationCell != null) {
+                    slider.stop();
+                } else {
+                    sourceCell.setSlider(null);
+                    destinationCell.setSlider(slider);
+                    slider.setPosition(x, y);
+                    destinationCell.push(slider);
+                }
+            }
+        }
     }
 }

@@ -3,7 +3,7 @@ package com.polly5315.slidingsquares.presentationModel.cells;
 import java.util.HashSet;
 import java.util.Set;
 
-public class BombCell implements IBombCell {
+public class BombCell extends CellBase implements IBombCell {
     private Set<IListener> _listeners = new HashSet<IListener>();
     private boolean _isDetonated = false;
 
@@ -12,11 +12,11 @@ public class BombCell implements IBombCell {
     }
 
     @Override
-    public void Push(ISlider slider) {
+    public void push(ISlider slider) {
         _isDetonated = true;
         for (IListener listener : _listeners)
             listener.onDetonated(this);
-        slider.BlowUp();
+        slider.blowUp();
     }
 
     @Override

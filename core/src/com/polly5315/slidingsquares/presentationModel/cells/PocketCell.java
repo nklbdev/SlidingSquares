@@ -5,7 +5,7 @@ import com.polly5315.slidingsquares.model.level.FamilyColor;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PocketCell implements IPocketCell {
+public class PocketCell extends CellBase implements IPocketCell {
     private Set<IListener> _listeners = new HashSet<IListener>();
     private FamilyColor _color;
     private PocketCellState _state;
@@ -36,11 +36,11 @@ public class PocketCell implements IPocketCell {
     }
 
     @Override
-    public void Push(ISlider slider) {
+    public void push(ISlider slider) {
         if (_state != PocketCellState.Open)
             return;
         if (slider.getColor() == _color) {
-            slider.Fix();
+            slider.fix();
             setState(PocketCellState.Closed);
         }
     }

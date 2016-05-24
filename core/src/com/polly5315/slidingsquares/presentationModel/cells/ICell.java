@@ -1,5 +1,7 @@
 package com.polly5315.slidingsquares.presentationModel.cells;
 
 public interface ICell {
-    void Push(ISlider slider);
+    void push(ISlider slider);
+    ISlider getSlider();
+    void setSlider(ISlider slider);
 }

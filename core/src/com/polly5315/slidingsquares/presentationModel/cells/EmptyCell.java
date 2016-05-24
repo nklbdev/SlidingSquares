@@ -1,8 +1,8 @@
 package com.polly5315.slidingsquares.presentationModel.cells;
 
-public class EmptyCell implements IEmptyCell {
+public class EmptyCell extends CellBase implements IEmptyCell {
     @Override
-    public void Push(ISlider slider) {
+    public void push(ISlider slider) {
         //
     }
 }

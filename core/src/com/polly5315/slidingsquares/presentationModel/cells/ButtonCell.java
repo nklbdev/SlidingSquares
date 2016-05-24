@@ -5,7 +5,7 @@ import com.polly5315.slidingsquares.model.level.FamilyColor;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ButtonCell implements IButtonCell {
+public class ButtonCell extends CellBase implements IButtonCell {
     private final Set<IListener> _listeners = new HashSet<IListener>();
     private boolean _isPushed = false;
     private final FamilyColor _color;
@@ -16,7 +16,7 @@ public class ButtonCell implements IButtonCell {
     }
 
     @Override
-    public void Push(ISlider slider) {
+    public void push(ISlider slider) {
         if (_isPushed || slider.getColor() != _color) return;
 
         _isPushed = true;

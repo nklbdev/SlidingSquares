@@ -6,10 +6,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.polly5315.slidingsquares.presentationModel.Direction;
@@ -24,11 +21,16 @@ public class LevelScreen extends ScreenAdapter {
     private final float _secondsPerStep = 0.1f;
     private float _secondsSinceLastStep = 0f;
     private final Stage _stage = new Stage(new ExtendViewport(640, 480, 800, 480));
+    private final Group _sliderGroup = new Group();
+    private final Group _cellGroup = new Group();
 
     public LevelScreen(IEngine engine) {
         if (engine == null)
             throw new IllegalArgumentException("presentationModel cannot be null");
         _engine = engine;
+        _stage.addActor(_cellGroup);
+        _stage.addActor(_sliderGroup);
+
 
         final Texture idleBombTexture    = new Texture(Gdx.files.internal("sprites/idle-bomb.png"));
         final Texture detonatedBombTexture = new Texture(Gdx.files.internal("sprites/detonated-bomb.png"));
@@ -49,27 +51,27 @@ public class LevelScreen extends ScreenAdapter {
 
             @Override
             public void onEmptyCellAdded(IEngine engine, IEmptyCell cell, int x, int y) {
-                _stage.addActor(new EmptyCellActor(x, y, emptyCellTexture));
+                _cellGroup.addActor(new EmptyCellActor(x, y, emptyCellTexture));
             }
 
             @Override
             public void onButtonCellAdded(IEngine engine, IButtonCell cell, int x, int y) {
-                _stage.addActor(new ButtonActor(cell, x, y, idleButtonTexture, pushedButtonTexture));
+                _cellGroup.addActor(new ButtonActor(cell, x, y, idleButtonTexture, pushedButtonTexture));
             }
 
             @Override
             public void onPocketCellAdded(IEngine engine, IPocketCell cell, int x, int y) {
-                _stage.addActor(new PocketActor(cell, x, y, openPocketTexture, closedPocketTexture));
+                _cellGroup.addActor(new PocketActor(cell, x, y, openPocketTexture, closedPocketTexture));
             }
 
             @Override
             public void onBombCellAdded(IEngine engine, IBombCell cell, int x, int y) {
-                _stage.addActor(new BombActor(cell, x, y, idleBombTexture, detonatedBombTexture));
+                _cellGroup.addActor(new BombActor(cell, x, y, idleBombTexture, detonatedBombTexture));
             }
 
             @Override
             public void onSliderAdded(IEngine engine, ISlider slider, int x, int y) {
-                _stage.addActor(new SliderActor(slider, idleSliderTexture, fixedSliderTexture, blastedSliderTexture));
+                _sliderGroup.addActor(new SliderActor(slider, idleSliderTexture, fixedSliderTexture, blastedSliderTexture));
             }
         };
         _engine.addListener(engineListener);
@@ -87,7 +89,6 @@ public class LevelScreen extends ScreenAdapter {
         InputProcessor inputProcessor = new InputProcessor() {
             @Override
             public boolean keyDown(int keycode) {
-                _engine.startTurn(Direction.Left);
                 switch (keycode) {
                     case Input.Keys.LEFT:
                         _engine.startTurn(Direction.Left);

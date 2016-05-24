@@ -1,38 +1,70 @@
 package com.polly5315.slidingsquares.presentationModel.cells;
 
 import com.polly5315.slidingsquares.model.level.FamilyColor;
+import com.polly5315.slidingsquares.presentationModel.Direction;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class Slider implements ISlider {
+    private final ISliderMover _mover;
     private final FamilyColor _color;
     private SliderState _state;
     private final Set<IListener> _listeners = new HashSet<IListener>();
     private int _x, _y;
+    private Direction _direction;
+    private int _stamina;
 
-    public Slider(FamilyColor color) {
-        this(color, SliderState.Idle);
+    public Slider(FamilyColor color, ISliderMover mover) {
+        this(color, SliderState.Idle, mover);
     }
 
-    public Slider(FamilyColor color, SliderState state) {
+    public Slider(FamilyColor color, SliderState state, ISliderMover mover) {
+        if (mover == null)
+            throw new IllegalArgumentException("mover cannot be null");
         _color = color;
         _state = state;
+        _mover = mover;
     }
 
     @Override
-    public void Fix() {
+    public void start(Direction direction) {
+        if (_state == SliderState.Idle) {
+            setState(SliderState.Sliding);
+            _direction = direction;
+        }
 
     }
 
     @Override
-    public void BlowUp() {
-
+    public void slide() {
+        if (_state == SliderState.Sliding && _stamina > 0)
+            _mover.moveSlider(this, _x + _direction.x * _stamina, _y + _direction.y * _stamina);
+        _stamina = 0;
     }
 
     @Override
-    public void Stop() {
+    public void increaseStamina() {
+        if (_state == SliderState.Sliding)
+            _stamina++;
+    }
 
+    @Override
+    public void fix() {
+        if (_state == SliderState.Sliding)
+            setState(SliderState.Fixed);
+    }
+
+    @Override
+    public void blowUp() {
+        if (_state == SliderState.Sliding)
+            setState(SliderState.Blasted);
+    }
+
+    @Override
+    public void stop() {
+        if (_state == SliderState.Sliding)
+            setState(SliderState.Idle);
     }
 
     @Override
