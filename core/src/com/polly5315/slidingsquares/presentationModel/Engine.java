@@ -122,7 +122,7 @@ public class Engine implements IEngine, ISliderMover {
     private void validateCellCoordinates(int x, int y) {
         if (x < 0 || x >= _width)
             throw new IndexOutOfBoundsException("x must be between 0 and width");
-        if (y < 0 || y >= _width)
+        if (y < 0 || y >= _height)
             throw new IndexOutOfBoundsException("y must be between 0 and width");
     }
 
@@ -217,6 +217,7 @@ public class Engine implements IEngine, ISliderMover {
 
         _sliders.add(slider);
 
+        _cells[x][y].setSlider(slider);
         _cells[x][y].push(slider);
 
         for (IListener listener : _listeners)
@@ -238,6 +239,7 @@ public class Engine implements IEngine, ISliderMover {
                 ISlider sliderInDestinationCell = destinationCell.getSlider();
                 if (sliderInDestinationCell != null)
                     sliderInDestinationCell.slide();
+                sliderInDestinationCell = destinationCell.getSlider();
                 if (sliderInDestinationCell != null) {
                     slider.stop();
                 } else {
