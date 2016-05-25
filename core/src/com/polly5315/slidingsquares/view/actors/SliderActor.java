@@ -13,7 +13,6 @@ public class SliderActor extends Actor {
     private final Texture _blastedTexture;
     private Texture _currentTexture;
 
-
     public SliderActor(ISlider slider, Texture idleSliderTexture, Texture fixedSliderTexture, Texture blastedSliderTexture, final float secondsPerStep) {
         _slider = slider;
         _idleTexture = idleSliderTexture;
@@ -23,7 +22,42 @@ public class SliderActor extends Actor {
         _slider.addListener(new ISlider.IListener() {
             @Override
             public void onStateChanged(ISlider slider) {
-                onSliderStateChanged();
+                switch (_slider.getState()) {
+                    case Idle:
+                        addAction(Actions.delay(secondsPerStep, Actions.run(new Runnable() {
+                            @Override
+                            public void run() {
+                                _currentTexture = _idleTexture;
+                            }
+                        })));
+                        break;
+                    case Blasted:
+                        addAction(Actions.delay(secondsPerStep, Actions.run(new Runnable() {
+                            @Override
+                            public void run() {
+                                _currentTexture = _blastedTexture;
+                            }
+                        })));
+                        break;
+                    case Fixed:
+                        addAction(Actions.delay(secondsPerStep, Actions.run(new Runnable() {
+                            @Override
+                            public void run() {
+                                _currentTexture = _fixedTexture;
+                            }
+                        })));
+                        break;
+                    case Sliding:
+                        addAction(Actions.delay(secondsPerStep, Actions.run(new Runnable() {
+                            @Override
+                            public void run() {
+                                _currentTexture = _idleTexture;
+                            }
+                        })));
+                        break;
+                    default:
+                        throw new IllegalStateException("Unsupported state");
+                }
             }
 
             @Override
@@ -31,32 +65,24 @@ public class SliderActor extends Actor {
                 addAction(Actions.moveTo(slider.getX() * 8, slider.getY() * 8, secondsPerStep));
             }
         });
-        onSliderStateChanged();
-    }
 
-    private void onSliderStateChanged() {
         switch (_slider.getState()) {
             case Idle:
-                _currentTexture = _idleTexture;
+                    _currentTexture = _idleTexture;
                 break;
             case Blasted:
-                _currentTexture = _blastedTexture;
+                    _currentTexture = _blastedTexture;
                 break;
             case Fixed:
-                _currentTexture = _fixedTexture;
+                    _currentTexture = _fixedTexture;
                 break;
             case Sliding:
-                _currentTexture = _idleTexture;
+                    _currentTexture = _idleTexture;
                 break;
             default:
                 throw new IllegalStateException("Unsupported state");
         }
     }
-
-    //@Override
-    //public void act(float delta) {
-    //    super.act(delta);
-    //}
 
     @Override
     public void draw(Batch batch, float parentAlpha) {

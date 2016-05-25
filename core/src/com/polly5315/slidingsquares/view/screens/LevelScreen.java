@@ -20,7 +20,7 @@ public class LevelScreen extends ScreenAdapter {
     private final IEngine _engine;
     //private final BitmapFont _font;
     //private final Batch _batch;
-    private final float _secondsPerStep = 0.1f;
+    private final float _secondsPerStep = 0.2f;
     private float _secondsSinceLastStep = 0f;
     private final Stage _stage = new Stage(new ExtendViewport(640, 480, 800, 480));
     private final Group _sliderGroup = new Group();
@@ -69,17 +69,17 @@ public class LevelScreen extends ScreenAdapter {
 
             @Override
             public void onButtonCellAdded(IEngine engine, IButtonCell cell, int x, int y) {
-                _cellGroup.addActor(new ButtonActor(cell, x, y, idleButtonTexture, pushedButtonTexture));
+                _cellGroup.addActor(new ButtonActor(cell, x, y, idleButtonTexture, pushedButtonTexture, _secondsPerStep));
             }
 
             @Override
             public void onPocketCellAdded(IEngine engine, IPocketCell cell, int x, int y) {
-                _cellGroup.addActor(new PocketActor(cell, x, y, openPocketTexture, closedPocketTexture));
+                _cellGroup.addActor(new PocketActor(cell, x, y, openPocketTexture, closedPocketTexture, _secondsPerStep));
             }
 
             @Override
             public void onBombCellAdded(IEngine engine, IBombCell cell, int x, int y) {
-                _cellGroup.addActor(new BombActor(cell, x, y, idleBombTexture, detonatedBombTexture));
+                _cellGroup.addActor(new BombActor(cell, x, y, idleBombTexture, detonatedBombTexture, _secondsPerStep));
             }
 
             @Override
