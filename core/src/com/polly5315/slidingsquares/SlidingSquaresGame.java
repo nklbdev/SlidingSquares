@@ -33,7 +33,7 @@ public class SlidingSquaresGame extends Game {
 		engine.addEmptyCell(3, 2);
 		engine.addEmptyCell(4, 2);
 
-		engine.addButtonCell(0, 3, FamilyColor.Pink, false);
+		//engine.addButtonCell(0, 3, FamilyColor.Pink, false);
 		engine.addEmptyCell(1, 3);
 		engine.addEmptyCell(2, 3);
 		engine.addEmptyCell(3, 3);
@@ -42,12 +42,13 @@ public class SlidingSquaresGame extends Game {
 		engine.addEmptyCell(0, 4);
 		engine.addEmptyCell(1, 4);
 		engine.addEmptyCell(2, 4);
-		engine.addEmptyCell(3, 4);
+		//engine.addEmptyCell(3, 4);
 		engine.addEmptyCell(4, 4);
 
 		engine.addBombCell(4, 5, false);
 
-		engine.addPocketCell(3, 0, FamilyColor.Pink, PocketCellState.Hidden);
+		engine.addPocketCell(3, 0, FamilyColor.Pink, PocketCellState.Open);
+		engine.addPocketCell(3, 4, FamilyColor.Pink, PocketCellState.Open);
 		engine.addSlider(1, 0, FamilyColor.Pink, SliderState.Idle);
 		engine.addSlider(1, 4, FamilyColor.Pink, SliderState.Idle);
 

@@ -8,8 +8,10 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.polly5315.slidingsquares.presentationModel.Direction;
+import com.polly5315.slidingsquares.presentationModel.EngineState;
 import com.polly5315.slidingsquares.presentationModel.IEngine;
 import com.polly5315.slidingsquares.presentationModel.cells.*;
 import com.polly5315.slidingsquares.view.actors.*;
@@ -46,7 +48,18 @@ public class LevelScreen extends ScreenAdapter {
         IEngine.IListener engineListener = new IEngine.IListener() {
             @Override
             public void onStateChanged(IEngine engine) {
-
+                EngineState engineState = _engine.getState();
+                if (engineState == EngineState.Winned) {
+                    Image image = new Image(emptyCellTexture) {{
+                        setPosition(100, 100);
+                    }};
+                    _stage.addActor(image);
+                } else if (engineState == EngineState.Defeated) {
+                    Image image = new Image(blastedSliderTexture) {{
+                        setPosition(100, 100);
+                    }};
+                    _stage.addActor(image);
+                }
             }
 
             @Override

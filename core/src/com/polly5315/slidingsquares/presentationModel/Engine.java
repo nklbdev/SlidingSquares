@@ -10,34 +10,11 @@ public class Engine implements IEngine, ISliderMover {
     private EngineState _state;
     private final int _width;
     private final int _height;
-    private final Collection<IEmptyCell> _emptyCells = new ArrayList<IEmptyCell>();
-    private final Collection<IBombCell> _bombCells = new ArrayList<IBombCell>();
     private final Collection<IPocketCell> _pocketCells = new ArrayList<IPocketCell>();
     private final Collection<IButtonCell> _buttonCells = new ArrayList<IButtonCell>();
     private final Collection<ISlider> _sliders = new ArrayList<ISlider>();
     private final ICell[][] _cells;
     private int _turnCount = 0;
-    private final ISlider.IListener _sliderListener = new ISlider.IListener() {
-        @Override
-        public void onStateChanged(ISlider slider) {
-            if (_state != EngineState.ProcessingTurn)
-                return;
-            boolean allSlidersAreFixed = true;
-            for (ISlider mySlider : _sliders)
-                if (mySlider.getState() != SliderState.Fixed) {
-                    allSlidersAreFixed = false;
-                    break;
-                }
-            if (allSlidersAreFixed)
-                setState(EngineState.Winned);
-        }
-
-        @Override
-        public void onPositionChanged(ISlider slider) {
-
-        }
-    };
-
     public Engine(int width, int height) {
         if (width < 0)
             throw new IllegalArgumentException("width cannot be negative");
@@ -58,6 +35,7 @@ public class Engine implements IEngine, ISliderMover {
         setState(EngineState.ProcessingTurn);
         for (ISlider slider : _sliders)
             slider.start(direction);
+        _turnCount++;
     }
 
     @Override
@@ -68,7 +46,9 @@ public class Engine implements IEngine, ISliderMover {
             slider.increaseStamina();
         for (ISlider slider : _sliders)
             slider.slide();
+
         boolean slidingSlidersAbsent = true;
+
         for (ISlider slider : _sliders) {
             if (slider.getState() == SliderState.Sliding) {
                 slidingSlidersAbsent = false;
@@ -87,6 +67,20 @@ public class Engine implements IEngine, ISliderMover {
     private void setState(EngineState state) {
         if (state == _state)
             return;
+        if (state == EngineState.WaitingForTurn) {
+            boolean allSlidersFixed = true;
+            for (ISlider slider : _sliders) {
+                SliderState sliderState = slider.getState();
+                if (sliderState == SliderState.Blasted) {
+                    state = EngineState.Defeated;
+                } else if (sliderState != SliderState.Fixed) {
+                    allSlidersFixed = false;
+                }
+            }
+            if (allSlidersFixed)
+                state = EngineState.Winned;
+        }
+
         _state = state;
         for (IListener listener : _listeners)
             listener.onStateChanged(this);
@@ -185,6 +179,7 @@ public class Engine implements IEngine, ISliderMover {
                 cell.addButtonToListen(buttonCell);
 
         _cells[x][y] = cell;
+        _pocketCells.add(cell);
 
         for (IListener listener : _listeners)
             listener.onPocketCellAdded(this, cell, x, y);
@@ -212,8 +207,6 @@ public class Engine implements IEngine, ISliderMover {
 
         ISlider slider = new Slider(color, state, this);
         slider.setPosition(x, y);
-
-        slider.addListener(_sliderListener);
 
         _sliders.add(slider);
 
