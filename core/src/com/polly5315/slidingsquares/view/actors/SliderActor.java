@@ -3,6 +3,7 @@ package com.polly5315.slidingsquares.view.actors;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.polly5315.slidingsquares.presentationModel.cells.ISlider;
 
 public class SliderActor extends Actor {
@@ -13,7 +14,7 @@ public class SliderActor extends Actor {
     private Texture _currentTexture;
 
 
-    public SliderActor(ISlider slider, Texture idleSliderTexture, Texture fixedSliderTexture, Texture blastedSliderTexture) {
+    public SliderActor(ISlider slider, Texture idleSliderTexture, Texture fixedSliderTexture, Texture blastedSliderTexture, final float secondsPerStep) {
         _slider = slider;
         _idleTexture = idleSliderTexture;
         _fixedTexture = fixedSliderTexture;
@@ -27,7 +28,7 @@ public class SliderActor extends Actor {
 
             @Override
             public void onPositionChanged(ISlider slider) {
-                setPosition(slider.getX() * 8, slider.getY() * 8);
+                addAction(Actions.moveTo(slider.getX() * 8, slider.getY() * 8, secondsPerStep));
             }
         });
         onSliderStateChanged();
@@ -51,6 +52,11 @@ public class SliderActor extends Actor {
                 throw new IllegalStateException("Unsupported state");
         }
     }
+
+    //@Override
+    //public void act(float delta) {
+    //    super.act(delta);
+    //}
 
     @Override
     public void draw(Batch batch, float parentAlpha) {

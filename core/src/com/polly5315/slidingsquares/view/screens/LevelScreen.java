@@ -84,7 +84,7 @@ public class LevelScreen extends ScreenAdapter {
 
             @Override
             public void onSliderAdded(IEngine engine, ISlider slider, int x, int y) {
-                _sliderGroup.addActor(new SliderActor(slider, idleSliderTexture, fixedSliderTexture, blastedSliderTexture));
+                _sliderGroup.addActor(new SliderActor(slider, idleSliderTexture, fixedSliderTexture, blastedSliderTexture, _secondsPerStep));
             }
         };
         _engine.addListener(engineListener);
