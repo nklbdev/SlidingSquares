@@ -11,6 +11,7 @@ public class BombActor extends Actor {
     private Texture _currentTexture;
 
     public BombActor(IBombCell cell, int x, int y, Texture idleTexture, final Texture detonatedTexture, final float secondsPerStep) {
+        setSize(1, 1);
         if (cell == null)
             throw new IllegalArgumentException("cell cannot be null");
         if (idleTexture == null)
@@ -18,8 +19,7 @@ public class BombActor extends Actor {
         if (detonatedTexture == null)
             throw new IllegalArgumentException("detonatedTexture cannot be null");
         _cell = cell;
-        setPosition(x * 8, y * 8);
-        setSize(8, 8);
+        setPosition(x, y);
         _currentTexture = cell.isDetonated() ? detonatedTexture : idleTexture;
         _cell.addListener(new IBombCell.IListener() {
             @Override
@@ -36,6 +36,6 @@ public class BombActor extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(_currentTexture, getX(), getY());
+        batch.draw(_currentTexture, getX(), getY(), getWidth(), getHeight());
     }
 }

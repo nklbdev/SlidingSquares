@@ -15,10 +15,11 @@ public class SliderActor extends Actor {
 
     public SliderActor(ISlider slider, Texture idleSliderTexture, Texture fixedSliderTexture, Texture blastedSliderTexture, final float secondsPerStep) {
         _slider = slider;
+        setSize(1, 1);
         _idleTexture = idleSliderTexture;
         _fixedTexture = fixedSliderTexture;
         _blastedTexture = blastedSliderTexture;
-        setPosition(slider.getX() * 8, slider.getY() * 8);
+        setPosition(slider.getX(), slider.getY());
         _slider.addListener(new ISlider.IListener() {
             @Override
             public void onStateChanged(ISlider slider) {
@@ -62,7 +63,7 @@ public class SliderActor extends Actor {
 
             @Override
             public void onPositionChanged(ISlider slider) {
-                addAction(Actions.moveTo(slider.getX() * 8, slider.getY() * 8, secondsPerStep));
+                addAction(Actions.moveTo(slider.getX(), slider.getY(), secondsPerStep));
             }
         });
 
@@ -87,6 +88,6 @@ public class SliderActor extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         if (_currentTexture != null)
-            batch.draw(_currentTexture, getX(), getY());
+            batch.draw(_currentTexture, getX(), getY(), getWidth(), getHeight());
     }
 }

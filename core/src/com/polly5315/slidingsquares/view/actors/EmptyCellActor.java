@@ -8,13 +8,13 @@ public class EmptyCellActor extends Actor {
     private final Texture _texture;
 
     public EmptyCellActor(int x, int y, Texture emptyCellTexture) {
-        setPosition(x * 8, y * 8);
-        setSize(8, 8);
+        setSize(1, 1);
+        setPosition(x, y);
         _texture = emptyCellTexture;
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(_texture, getX(), getY());
+        batch.draw(_texture, getX(), getY(), getWidth(), getHeight());
     }
 }

@@ -4,12 +4,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.polly5315.slidingsquares.presentationModel.Direction;
 import com.polly5315.slidingsquares.presentationModel.EngineState;
 import com.polly5315.slidingsquares.presentationModel.IEngine;
@@ -22,28 +28,98 @@ public class LevelScreen extends ScreenAdapter {
     //private final Batch _batch;
     private final float _secondsPerStep = 0.2f;
     private float _secondsSinceLastStep = 0f;
-    private final Stage _stage = new Stage(new ExtendViewport(640, 480, 800, 480));
+    private final Stage _stage;
+    private final Group _boardGroup = new Group();
     private final Group _sliderGroup = new Group();
     private final Group _cellGroup = new Group();
+
+    private final float _viewportWidth = 240;
+    private final float _viewportHeight = 320;
+
+    private final float _levelNumberLabelX = 8;
+    private final float _levelNumberLabelY = 280;
+    private final float _levelNumberLabelWidth = 108;
+    private final float _levelNumberLabelHeight = 32;
+
+    private final float _turnCountLabelX = 124;
+    private final float _turnCountLabelY = 280;
+    private final float _turnCountLabelWidth = 108;
+    private final float _turnCountLabelHeight = 32;
+
+    private final float _backButtonX = 8;
+    private final float _backButtonY = 8;
+    private final float _backButtonWidth = 108;
+    private final float _backButtonHeight = 32;
+
+    private final float _replayButtonX = 124;
+    private final float _replayButtonY = 8;
+    private final float _replayButtonWidth = 108;
+    private final float _replayButtonHeight = 32;
+
+    private final float _boardBaseX = 8;
+    private final float _boardBaseY = 48;
+    private final float _boardBaseWidth = 224;
+    private final float _boardBaseHeight = 224;
 
     public LevelScreen(IEngine engine) {
         if (engine == null)
             throw new IllegalArgumentException("presentationModel cannot be null");
         _engine = engine;
-        _stage.addActor(_cellGroup);
-        _stage.addActor(_sliderGroup);
 
+        final int boardColumnsCount = _engine.getWidth();
+        final int boardRowsCount = _engine.getHeight();
+        final float boardRatio = (float)boardColumnsCount / boardRowsCount;
+        final float boardBaseRatio = _boardBaseWidth / _boardBaseHeight;
+        final float boardWidth = boardRatio >= boardBaseRatio ? _boardBaseWidth : boardBaseRatio * boardRatio * _boardBaseWidth;
+        final float boardHeight = boardRatio <= boardBaseRatio ? _boardBaseHeight : boardBaseRatio * _boardBaseHeight / boardRatio;
+        final float boardX = _boardBaseX + (_boardBaseWidth - boardWidth) / 2;
+        final float boardY = _boardBaseY + (_boardBaseHeight - boardHeight) / 2;
+        final float cellSize = boardWidth / boardColumnsCount;
 
-        final Texture idleBombTexture    = new Texture(Gdx.files.internal("sprites/idle-bomb.png"));
+        Camera camera = new OrthographicCamera();
+        Viewport viewport = new ExtendViewport(_viewportWidth, _viewportHeight, _viewportWidth, _viewportHeight, camera);
+        camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
+        _stage = new Stage(viewport);
+        _stage.addActor(_boardGroup);
+
+        _boardGroup.setScale(cellSize);
+        _boardGroup.setPosition(boardX, boardY);
+        _boardGroup.addActor(_cellGroup);
+        _boardGroup.addActor(_sliderGroup);
+
+        final Texture idleBombTexture      = new Texture(Gdx.files.internal("sprites/idle-bomb.png"));
         final Texture detonatedBombTexture = new Texture(Gdx.files.internal("sprites/detonated-bomb.png"));
-        final Texture idleButtonTexture = new Texture(Gdx.files.internal("sprites/idle-button.png"));
-        final Texture pushedButtonTexture = new Texture(Gdx.files.internal("sprites/pushed-button.png"));
-        final Texture idleSliderTexture = new Texture(Gdx.files.internal("sprites/idle-slider.png"));
-        final Texture fixedSliderTexture = new Texture(Gdx.files.internal("sprites/fixed-slider.png"));
+        final Texture idleButtonTexture    = new Texture(Gdx.files.internal("sprites/idle-button.png"));
+        final Texture pushedButtonTexture  = new Texture(Gdx.files.internal("sprites/pushed-button.png"));
+        final Texture idleSliderTexture    = new Texture(Gdx.files.internal("sprites/idle-slider.png"));
+        final Texture fixedSliderTexture   = new Texture(Gdx.files.internal("sprites/fixed-slider.png"));
         final Texture blastedSliderTexture = new Texture(Gdx.files.internal("sprites/blasted-slider.png"));
-        final Texture openPocketTexture = new Texture(Gdx.files.internal("sprites/open-pocket.png"));
-        final Texture closedPocketTexture = new Texture(Gdx.files.internal("sprites/closed-pocket.png"));
-        final Texture emptyCellTexture = new Texture(Gdx.files.internal("sprites/empty-cell.png"));
+        final Texture openPocketTexture    = new Texture(Gdx.files.internal("sprites/open-pocket.png"));
+        final Texture closedPocketTexture  = new Texture(Gdx.files.internal("sprites/closed-pocket.png"));
+        final Texture emptyCellTexture     = new Texture(Gdx.files.internal("sprites/empty-cell.png"));
+        final Texture buttonMockTexture    = new Texture(Gdx.files.internal("sprites/button-mock.png"));
+        final TextureRegion buttonMockRegion = new TextureRegion(buttonMockTexture);
+        final TextureRegionDrawable buttonMockRegionDrawable = new TextureRegionDrawable(buttonMockRegion);
+
+        final Button levelNumberButton = new Button(buttonMockRegionDrawable);
+        levelNumberButton.setPosition(_levelNumberLabelX, _levelNumberLabelY);
+        levelNumberButton.setSize(_levelNumberLabelWidth, _levelNumberLabelHeight);
+        _stage.addActor(levelNumberButton);
+
+        final Button turnCountButton = new Button(buttonMockRegionDrawable);
+        turnCountButton.setPosition(_turnCountLabelX, _turnCountLabelY);
+        turnCountButton.setSize(_turnCountLabelWidth, _turnCountLabelHeight);
+        _stage.addActor(turnCountButton);
+
+        final Button backButton = new Button(buttonMockRegionDrawable);
+        backButton.setPosition(_backButtonX, _backButtonY);
+        backButton.setSize(_backButtonWidth, _backButtonHeight);
+        _stage.addActor(backButton);
+
+        final Button replayButton = new Button(buttonMockRegionDrawable);
+        replayButton.setPosition(_replayButtonX, _replayButtonY);
+        replayButton.setSize(_replayButtonWidth, _replayButtonHeight);
+        _stage.addActor(replayButton);
 
         IEngine.IListener engineListener = new IEngine.IListener() {
             @Override
@@ -188,7 +264,7 @@ public class LevelScreen extends ScreenAdapter {
 
     @Override
     public void resize(int width, int height) {
-
+        _stage.getViewport().update(width, height, true);
     }
 
     @Override

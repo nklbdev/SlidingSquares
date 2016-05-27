@@ -11,6 +11,7 @@ public class PocketActor extends Actor {
     private Texture _currentTexture;
 
     public PocketActor(final IPocketCell cell, int x, int y, final Texture openPocketTexture, final Texture closedPocketTexture, final float secondsPerStep) {
+        setSize(1, 1);
         if (cell == null)
             throw new IllegalArgumentException("cell cannot be null");
         if (openPocketTexture == null)
@@ -18,8 +19,7 @@ public class PocketActor extends Actor {
         if (closedPocketTexture == null)
             throw new IllegalArgumentException("closedPocketTexture cannot be null");
         _cell = cell;
-        setPosition(x * 8, y * 8);
-        setSize(8, 8);
+        setPosition(x, y);
         switch (cell.getState()) {
             case Closed:
                 _currentTexture = closedPocketTexture;
@@ -71,6 +71,6 @@ public class PocketActor extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         if (_currentTexture != null)
-            batch.draw(_currentTexture, getX(), getY());
+            batch.draw(_currentTexture, getX(), getY(), getWidth(), getHeight());
     }
 }
