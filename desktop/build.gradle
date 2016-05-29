@@ -1,3 +1,4 @@
+import com.badlogic.gdx.tools.texturepacker.TexturePacker
 apply plugin: "java"
 
 sourceCompatibility = 1.6
@@ -5,6 +6,38 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 
 project.ext.mainClassName = "com.polly5315.slidingsquares.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../android/assets");
+
+task packGraphics << {
+    def inkscapeComPath = "C:\\Program Files\\Inkscape\\inkscape.com"
+
+    def sourceRootDir = file("../graphics/source")
+    def buildRootDir = file("../graphics/build")
+    def outputRootDir = file("../android/assets/graphics")
+    if (buildRootDir.exists())
+        GFileUtils.cleanDirectory(buildRootDir)
+    else
+        GFileUtils.mkdirs(buildRootDir)
+
+    if (outputRootDir.exists())
+        GFileUtils.cleanDirectory(outputRootDir)
+    else
+        GFileUtils.mkdirs(outputRootDir)
+
+    for(File svgFile: sourceRootDir.listFiles()) {
+        //todo get filename without extension
+        def svgWithoutExt = svgFile.name.lastIndexOf('.').with {it != -1 ? svgFile.name[0..<it] : svgFile.name}
+        def buildDir = new File(buildRootDir, svgWithoutExt)
+        GFileUtils.mkdirs(buildDir)
+        new XmlSlurper().parse(svgFile).'**'.findAll {n -> n.title?.text()}.each {n ->
+            def targetFile = new File(buildDir, "${n.title.text()}.png")
+            exec {
+                executable inkscapeComPath
+                args "--export-id=${n.@id}", "--export-id-only", "--export-png=\"${targetFile.path}\"", "${svgFile.path}"
+            }
+        }
+        TexturePacker.process(buildDir.path, outputRootDir.path, svgWithoutExt);
+    }
+}
 
 task run(dependsOn: classes, type: JavaExec) {
     main = project.mainClassName
