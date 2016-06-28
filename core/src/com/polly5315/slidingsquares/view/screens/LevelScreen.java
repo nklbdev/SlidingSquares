@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -26,7 +27,7 @@ public class LevelScreen extends ScreenAdapter {
     private final IEngine _engine;
     //private final BitmapFont _font;
     //private final Batch _batch;
-    private final float _secondsPerStep = 0.2f;
+    private final float _secondsPerStep = 0.05f;
     private float _secondsSinceLastStep = 0f;
     private final Stage _stage;
     private final Group _boardGroup = new Group();
@@ -87,80 +88,95 @@ public class LevelScreen extends ScreenAdapter {
         _boardGroup.addActor(_cellGroup);
         _boardGroup.addActor(_sliderGroup);
 
-        final Texture idleBombTexture      = new Texture(Gdx.files.internal("sprites/idle-bomb.png"));
-        final Texture detonatedBombTexture = new Texture(Gdx.files.internal("sprites/detonated-bomb.png"));
-        final Texture idleButtonTexture    = new Texture(Gdx.files.internal("sprites/idle-button.png"));
-        final Texture pushedButtonTexture  = new Texture(Gdx.files.internal("sprites/pushed-button.png"));
-        final Texture idleSliderTexture    = new Texture(Gdx.files.internal("sprites/idle-slider.png"));
-        final Texture fixedSliderTexture   = new Texture(Gdx.files.internal("sprites/fixed-slider.png"));
-        final Texture blastedSliderTexture = new Texture(Gdx.files.internal("sprites/blasted-slider.png"));
-        final Texture openPocketTexture    = new Texture(Gdx.files.internal("sprites/open-pocket.png"));
-        final Texture closedPocketTexture  = new Texture(Gdx.files.internal("sprites/closed-pocket.png"));
-        final Texture emptyCellTexture     = new Texture(Gdx.files.internal("sprites/empty-cell.png"));
-        final Texture buttonMockTexture    = new Texture(Gdx.files.internal("sprites/button-mock.png"));
-        final TextureRegion buttonMockRegion = new TextureRegion(buttonMockTexture);
-        final TextureRegionDrawable buttonMockRegionDrawable = new TextureRegionDrawable(buttonMockRegion);
 
-        final Button levelNumberButton = new Button(buttonMockRegionDrawable);
-        levelNumberButton.setPosition(_levelNumberLabelX, _levelNumberLabelY);
-        levelNumberButton.setSize(_levelNumberLabelWidth, _levelNumberLabelHeight);
-        _stage.addActor(levelNumberButton);
+        TextureRegion orangeSlider = draftAtlas.findRegion("OrangeSlider");
+        final TextureRegion pinkSlider = draftAtlas.findRegion("PinkSlider");
+        TextureRegion greenSlider = draftAtlas.findRegion("GreenSlider");
+        final TextureRegion yellowSlider = draftAtlas.findRegion("YellowSlider");
+        final TextureRegion blueSlider = draftAtlas.findRegion("BlueSlider");
+        TextureRegion purpleSlider = draftAtlas.findRegion("PurpleSlider");
 
-        final Button turnCountButton = new Button(buttonMockRegionDrawable);
-        turnCountButton.setPosition(_turnCountLabelX, _turnCountLabelY);
-        turnCountButton.setSize(_turnCountLabelWidth, _turnCountLabelHeight);
-        _stage.addActor(turnCountButton);
+        TextureRegion orangePocket = draftAtlas.findRegion("OrangePocket");
+        final TextureRegion pinkPocket = draftAtlas.findRegion("PinkPocket");
+        TextureRegion greenPocket = draftAtlas.findRegion("GreenPocket");
+        final TextureRegion yellowPocket = draftAtlas.findRegion("YellowPocket");
+        TextureRegion bluePocket = draftAtlas.findRegion("BluePocket");
+        TextureRegion purplePocket = draftAtlas.findRegion("PurplePocket");
+        final TextureRegion closedPocket = draftAtlas.findRegion("ClosedPocket");
+        final TextureRegion hiddenPocket = draftAtlas.findRegion("HiddenPocket");
 
-        final Button backButton = new Button(buttonMockRegionDrawable);
-        backButton.setPosition(_backButtonX, _backButtonY);
-        backButton.setSize(_backButtonWidth, _backButtonHeight);
-        _stage.addActor(backButton);
+        TextureRegion orangeButton = draftAtlas.findRegion("OrangeButton");
+        final TextureRegion pinkButton = draftAtlas.findRegion("PinkButton");
+        TextureRegion greenButton = draftAtlas.findRegion("GreenButton");
+        final TextureRegion yellowButton = draftAtlas.findRegion("YellowButton");
+        final TextureRegion blueButton = draftAtlas.findRegion("BlueButton");
+        TextureRegion purpleButton = draftAtlas.findRegion("PurpleButton");
+        final TextureRegion pushedButton = draftAtlas.findRegion("PushedButton");
 
-        final Button replayButton = new Button(buttonMockRegionDrawable);
-        replayButton.setPosition(_replayButtonX, _replayButtonY);
-        replayButton.setSize(_replayButtonWidth, _replayButtonHeight);
-        _stage.addActor(replayButton);
+        final TextureRegion mine = draftAtlas.findRegion("Mine");
+        final TextureRegion blast = draftAtlas.findRegion("Blast");
+        final TextureRegion emptyCell = draftAtlas.findRegion("EmptyCell");
+
+        //final Button levelNumberButton = new Button(buttonMockRegionDrawable);
+        //levelNumberButton.setPosition(_levelNumberLabelX, _levelNumberLabelY);
+        //levelNumberButton.setSize(_levelNumberLabelWidth, _levelNumberLabelHeight);
+        //_stage.addActor(levelNumberButton);
+
+        //final Button turnCountButton = new Button(buttonMockRegionDrawable);
+        //turnCountButton.setPosition(_turnCountLabelX, _turnCountLabelY);
+        //turnCountButton.setSize(_turnCountLabelWidth, _turnCountLabelHeight);
+        //_stage.addActor(turnCountButton);
+
+        //final Button backButton = new Button(buttonMockRegionDrawable);
+        //backButton.setPosition(_backButtonX, _backButtonY);
+        //backButton.setSize(_backButtonWidth, _backButtonHeight);
+        //_stage.addActor(backButton);
+
+        //final Button replayButton = new Button(buttonMockRegionDrawable);
+        //replayButton.setPosition(_replayButtonX, _replayButtonY);
+        //replayButton.setSize(_replayButtonWidth, _replayButtonHeight);
+        //_stage.addActor(replayButton);
 
         IEngine.IListener engineListener = new IEngine.IListener() {
             @Override
             public void onStateChanged(IEngine engine) {
-                EngineState engineState = _engine.getState();
-                if (engineState == EngineState.Winned) {
-                    Image image = new Image(emptyCellTexture) {{
-                        setPosition(100, 100);
-                    }};
-                    _stage.addActor(image);
-                } else if (engineState == EngineState.Defeated) {
-                    Image image = new Image(blastedSliderTexture) {{
-                        setPosition(100, 100);
-                    }};
-                    _stage.addActor(image);
-                }
+                //EngineState engineState = _engine.getState();
+                //if (engineState == EngineState.Winned) {
+                //    Image image = new Image(emptyCellTexture) {{
+                //        setPosition(100, 100);
+                //    }};
+                //    _stage.addActor(image);
+                //} else if (engineState == EngineState.Defeated) {
+                //    Image image = new Image(blastedSliderTexture) {{
+                //        setPosition(100, 100);
+                //    }};
+                //    _stage.addActor(image);
+                //}
             }
 
             @Override
             public void onEmptyCellAdded(IEngine engine, IEmptyCell cell, int x, int y) {
-                _cellGroup.addActor(new EmptyCellActor(x, y, emptyCellTexture));
+                _cellGroup.addActor(new EmptyCellActor(x, y, emptyCell));
             }
 
             @Override
             public void onButtonCellAdded(IEngine engine, IButtonCell cell, int x, int y) {
-                _cellGroup.addActor(new ButtonActor(cell, x, y, idleButtonTexture, pushedButtonTexture, _secondsPerStep));
+                _cellGroup.addActor(new ButtonActor(cell, x, y, pinkButton, pushedButton, _secondsPerStep));
             }
 
             @Override
             public void onPocketCellAdded(IEngine engine, IPocketCell cell, int x, int y) {
-                _cellGroup.addActor(new PocketActor(cell, x, y, openPocketTexture, closedPocketTexture, _secondsPerStep));
+                _cellGroup.addActor(new PocketActor(cell, x, y, pinkPocket, closedPocket, hiddenPocket, _secondsPerStep));
             }
 
             @Override
             public void onBombCellAdded(IEngine engine, IBombCell cell, int x, int y) {
-                _cellGroup.addActor(new BombActor(cell, x, y, idleBombTexture, detonatedBombTexture, _secondsPerStep));
+                _cellGroup.addActor(new BombActor(cell, x, y, mine, blast, _secondsPerStep));
             }
 
             @Override
             public void onSliderAdded(IEngine engine, ISlider slider, int x, int y) {
-                _sliderGroup.addActor(new SliderActor(slider, idleSliderTexture, fixedSliderTexture, blastedSliderTexture, _secondsPerStep));
+                _sliderGroup.addActor(new SliderActor(slider, pinkSlider, null, null, _secondsPerStep));
             }
         };
         _engine.addListener(engineListener);

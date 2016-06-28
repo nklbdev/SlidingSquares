@@ -2,15 +2,16 @@ package com.polly5315.slidingsquares.view.actors;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.polly5315.slidingsquares.presentationModel.cells.IBombCell;
 
 public class BombActor extends Actor {
     private final IBombCell _cell;
-    private Texture _currentTexture;
+    private TextureRegion _currentTexture;
 
-    public BombActor(IBombCell cell, int x, int y, Texture idleTexture, final Texture detonatedTexture, final float secondsPerStep) {
+    public BombActor(IBombCell cell, int x, int y, TextureRegion idleTexture, final TextureRegion detonatedTexture, final float secondsPerStep) {
         setSize(1, 1);
         if (cell == null)
             throw new IllegalArgumentException("cell cannot be null");

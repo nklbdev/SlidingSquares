@@ -1,3 +1,14 @@
+import com.badlogic.gdx.tools.texturepacker.TexturePacker
+import org.apache.batik.bridge.BridgeContext
+import org.apache.batik.bridge.DocumentLoader
+import org.apache.batik.bridge.GVTBuilder
+import org.apache.batik.bridge.UserAgentAdapter
+import org.apache.batik.dom.svg.SAXSVGDocumentFactory
+import org.apache.batik.transcoder.TranscoderInput
+import org.apache.batik.transcoder.TranscoderOutput
+import org.apache.batik.transcoder.image.PNGTranscoder
+import org.apache.batik.util.XMLResourceDescriptor
+
 android {
     buildToolsVersion "23.0.2"
     compileSdkVersion 23
@@ -114,4 +125,166 @@ idea {
             }
         }
     }
+}
+
+enum SomeDpi {
+    Ldpi("ldpi", 0.75f),
+    Mdpi("mdpi", 1f),
+    Hdpi("hdpi", 1.5f),
+    Xhdpi("xdpi", 2f),
+    Xxhdpi("xxdpi", 3f),
+    Xxxhdpi("xxxdpi", 4f);
+
+    protected float _factor
+    protected String _description
+
+    public SomeDpi(String description, float factor) {
+        _description = description
+        _factor = factor
+    }
+
+    public String getDescription() {
+        return _description;
+    }
+
+    public float getFactor() {
+        return _factor;
+    }
+}
+
+class BuildAtlasesTask extends DefaultTask {
+    //todo Добавить копирование файлов pack.json
+    // в соответствующие папки переходной директории,
+    // чтобы TexturePacker использовал эти настройки
+
+    @InputDirectory
+    def File inputDir
+
+    @OutputDirectory
+    def File pngDir
+
+    @OutputDirectory
+    def File outputDir
+
+    def SomeDpi inputDpi
+
+    def Collection<SomeDpi> outputDpis
+
+    def TexturePacker.Settings texturePackerSettings
+
+    def convert(File inputFile, File outputFile, SomeDpi outputDpi) {
+        outputFile.parentFile.mkdirs()
+        outputFile.delete()
+
+        def ratio = outputDpi.factor / inputDpi.factor
+        double w, h
+
+        inputFile.withInputStream { inputStream ->
+            def parser = XMLResourceDescriptor.getXMLParserClassName();
+            def factory = new SAXSVGDocumentFactory(parser)
+            def document = factory.createDocument(inputFile.toURI().toURL().toString(), inputStream);
+            def agent = new UserAgentAdapter();
+            def loader = new DocumentLoader(agent);
+            def context = new BridgeContext(agent, loader);
+            context.setDynamic(true);
+            def builder = new GVTBuilder();
+            def root = builder.build(context, document);
+        }
+        inputFile.withInputStream { inputStream ->
+            outputFile.withOutputStream { outputStream ->
+                def transcoder = new PNGTranscoder()
+                transcoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, new Float(Math.round(w * ratio)))
+                transcoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, new Float(Math.round(h * ratio)))
+                transcoder.transcode(new TranscoderInput(inputStream), new TranscoderOutput(outputStream))
+            }
+        }
+    }
+
+    def getOutputFile(File inputFile, URI inputDirUri, SomeDpi outputDpi) {
+        def reflectedRelativePath = outputDpi.getDescription() + "/" + inputDirUri.relativize(inputFile.toURI()).path
+        def reflectedFile = new File(pngDir, reflectedRelativePath)
+        return new File(reflectedFile.parentFile, reflectedFile.name.substring(0, reflectedFile.name.lastIndexOf('.')) + ".png")
+    }
+
+    @TaskAction
+    def execute(IncrementalTaskInputs inputs) {
+        def inputDirUri = inputDir.toURI();
+
+        def atlasNames = new HashSet<String>();
+        inputDir.eachDir { dir -> atlasNames.add(dir.name) }
+
+        def outOfDateFilePaths = new HashSet<String>()
+        inputs.outOfDate { change ->
+            if (change.file.name.endsWith(".svg") && !change.file.parent.equals(inputDir.path))
+                outOfDateFilePaths.add(change.file.path)
+        }
+        inputDir.eachFileRecurse { inputFile ->
+            if (inputFile.name.endsWith(".svg") && !inputFile.parent.equals(inputDir.path) && !outOfDateFilePaths.contains(inputFile.path))
+                outputDpis.each { def outputDpi ->
+                    if (!getOutputFile(inputFile, inputDirUri, outputDpi).exists())
+                        outOfDateFilePaths.add(inputFile.path)
+                }
+        }
+
+        def outOfDateAtlasNames = new HashSet<String>()
+
+        outOfDateFilePaths.each { inputFilePath ->
+            def inputFile = new File(inputFilePath)
+            outputDpis.each { def outputDpi ->
+                def outputFile = getOutputFile(inputFile, inputDirUri, outputDpi)
+                convert(inputFile, outputFile, outputDpi)
+                def relativePath = inputDirUri.relativize(inputFile.parentFile.toURI()).path
+                outOfDateAtlasNames.add(getFirstDirectoryName(relativePath))
+            }
+        }
+
+        inputs.removed { change ->
+            if (!change.file.name.endsWith(".svg"))
+                return
+            outputDpis.each { def outputDpi ->
+                getOutputFile(change.file, inputDirUri, outputDpi).delete()
+                def relativePath = inputDirUri.relativize(change.file.parentFile.toURI()).path
+                outOfDateAtlasNames.add(getFirstDirectoryName(relativePath))
+            }
+        }
+
+        outOfDateAtlasNames.each { atlasName ->
+            outputDpis.each { def outputDpi ->
+                if (texturePackerSettings == null)
+                    TexturePacker.process(
+                            new File(pngDir, outputDpi.description + "/" + atlasName).path,
+                            new File(outputDir, outputDpi.description).path,
+                            atlasName)
+                else
+                    TexturePacker.process(
+                            texturePackerSettings,
+                            new File(pngDir, outputDpi.description + "/" + atlasName).path,
+                            new File(outputDir, outputDpi.description).path,
+                            atlasName)
+            }
+        }
+    }
+
+    def static getFirstDirectoryName(String relativePath) {
+        def slashIndex = relativePath.indexOf("/")
+        return slashIndex > 0 ? relativePath.substring(0, slashIndex) : relativePath
+    }
+}
+
+task buildAtlases(type: BuildAtlasesTask) {
+    inputDir = file('../resources/atlases')
+    inputDpi = SomeDpi.Mdpi
+    pngDir = file('../resources/atlases.build')
+    outputDpis = [
+            SomeDpi.Ldpi,
+            SomeDpi.Mdpi,
+            SomeDpi.Hdpi,
+            SomeDpi.Xhdpi,
+            SomeDpi.Xxhdpi,
+            SomeDpi.Xxxhdpi
+    ]
+    outputDir = file("assets/atlases")
+    texturePackerSettings = new TexturePacker.Settings(
+            combineSubdirectories: true
+    )
 }

@@ -2,15 +2,16 @@ package com.polly5315.slidingsquares.view.actors;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.polly5315.slidingsquares.presentationModel.cells.IPocketCell;
 
 public class PocketActor extends Actor {
     private final IPocketCell _cell;
-    private Texture _currentTexture;
+    private TextureRegion _currentTexture;
 
-    public PocketActor(final IPocketCell cell, int x, int y, final Texture openPocketTexture, final Texture closedPocketTexture, final float secondsPerStep) {
+    public PocketActor(final IPocketCell cell, int x, int y, final TextureRegion openPocketTexture, final TextureRegion closedPocketTexture, final TextureRegion hiddenPocketTexture, final float secondsPerStep) {
         setSize(1, 1);
         if (cell == null)
             throw new IllegalArgumentException("cell cannot be null");
@@ -25,7 +26,7 @@ public class PocketActor extends Actor {
                 _currentTexture = closedPocketTexture;
                 break;
             case Hidden:
-                _currentTexture = null;
+                _currentTexture = hiddenPocketTexture;
                 break;
             case Open:
                 _currentTexture = openPocketTexture;

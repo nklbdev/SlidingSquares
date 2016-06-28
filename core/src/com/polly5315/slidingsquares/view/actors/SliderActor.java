@@ -1,19 +1,19 @@
 package com.polly5315.slidingsquares.view.actors;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.polly5315.slidingsquares.presentationModel.cells.ISlider;
 
 public class SliderActor extends Actor {
     private final ISlider _slider;
-    private final Texture _idleTexture;
-    private final Texture _fixedTexture;
-    private final Texture _blastedTexture;
-    private Texture _currentTexture;
+    private final TextureRegion _idleTexture;
+    private final TextureRegion _fixedTexture;
+    private final TextureRegion _blastedTexture;
+    private TextureRegion _currentTexture;
 
-    public SliderActor(ISlider slider, Texture idleSliderTexture, Texture fixedSliderTexture, Texture blastedSliderTexture, final float secondsPerStep) {
+    public SliderActor(ISlider slider, TextureRegion idleSliderTexture, TextureRegion fixedSliderTexture, TextureRegion blastedSliderTexture, final float secondsPerStep) {
         _slider = slider;
         setSize(1, 1);
         _idleTexture = idleSliderTexture;
