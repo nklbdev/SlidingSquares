@@ -189,6 +189,8 @@ class BuildAtlasesTask extends DefaultTask {
             context.setDynamic(true);
             def builder = new GVTBuilder();
             def root = builder.build(context, document);
+            w = root.bounds.width;
+            h = root.bounds.height;
         }
         inputFile.withInputStream { inputStream ->
             outputFile.withOutputStream { outputStream ->

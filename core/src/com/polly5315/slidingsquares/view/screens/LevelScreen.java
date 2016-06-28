@@ -88,6 +88,7 @@ public class LevelScreen extends ScreenAdapter {
         _boardGroup.addActor(_cellGroup);
         _boardGroup.addActor(_sliderGroup);
 
+        TextureAtlas draftAtlas = new TextureAtlas(Gdx.files.internal("atlases/mdpi/stuff.atlas"));
 
         TextureRegion orangeSlider = draftAtlas.findRegion("OrangeSlider");
         final TextureRegion pinkSlider = draftAtlas.findRegion("PinkSlider");
