@@ -1,2 +1,2 @@
 # SlidingSquares
-none
+An abandoned pet project. Nothing more
